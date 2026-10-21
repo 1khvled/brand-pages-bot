@@ -1,0 +1,130 @@
+{
+  "brand": "AZTech Store",
+  "page_id": "816138634925735",
+  "locale": "fr-DZ",
+  "languages": [
+    "ar",
+    "fr"
+  ],
+  "bg": "#08080A",
+  "accent": "#1E88FF",
+  "white": "#F5F7FA",
+  "muted": "#8A94A6",
+  "logo": "assets/aztech_logo.jpg",
+  "tagline": "LEVEL UP YOUR SETUP",
+  "delivery_fr": "Livraison 58 wilaya",
+  "delivery_ar": "التوصيل 58 ولاية",
+  "cta_fr": "Commande : message privé",
+  "cta_ar": "للطلب : أرسل رسالة",
+  "price_note": "Neuf, garantie, prix ferme",
+  "zone": "69 area (Boumerdes)",
+  "cadence": {
+    "posts_per_day": 2,
+    "stories_per_day": 1,
+    "min_gap_minutes": 180,
+    "quiet_hours_local": [
+      0,
+      6
+    ],
+    "post_hours_local": [
+      9,
+      23
+    ]
+  },
+  "voice": {
+    "ar": "Arabic that a young Algerian would actually write. Short lines. Darija warmth, modern MSA. Say the price and the delivery. Never invent a spec. Never use 'like and share'.",
+    "fr": "Short, confident, friendly French from an Algerian shop. Say the price and the delivery. Never invent a spec. Never use 'like and share'."
+  },
+  "forbidden": [
+    "like",
+    "share",
+    "commentez",
+    "follow us",
+    "subscribe",
+    "livraison gratuite",
+    "garantie a vie",
+    "meilleur prix",
+    "numero 1",
+    "offre limitee",
+    "soldes",
+    "promo"
+  ],
+  "products": [
+    {
+      "id": "as-r1",
+      "name": "Attack Shark R1 Wireless Gaming Mouse",
+      "name_ar": "ماوس Attack Shark R1 لاسلكي",
+      "price": 5500,
+      "specs": [
+        "59 g ultralight - the lightest mouse we carry",
+        "PixArt PAW3311 sensor - 8000 DPI",
+        "Bluetooth / 2.4G / Wired"
+      ],
+      "ar_specs": [
+        "59 غرام فقط، خفيف جدا",
+        "حساس PixArt PAW3311 - 8000 DPI",
+        "بلوتوث / 2.4G / سلكي"
+      ],
+      "angle_fr": "A 59 gram mouse for people who move their hand 300 times an hour.",
+      "angle_ar": "ماوس بـ59 غرام، لمن يحرك يده 300 مرة في الساعة."
+    },
+    {
+      "id": "ajazz-aj179",
+      "name": "Ajazz AJ179 Pro 8K Gaming Mouse",
+      "name_ar": "ماوس Ajazz AJ179 Pro 8K",
+      "price": 10500,
+      "specs": [
+        "8000 Hz polling rate - 8 reads per millisecond",
+        "Wireless + wired, RGB, adjustable DPI",
+        "Lightweight shell for long sessions"
+      ],
+      "ar_specs": [
+        "8000 هرتز - 8 قراءات في كل ميلي ثانية",
+        "لاسلكي وسلكي، RGB، DPI قابل للضبط",
+        "خفيف يناسب الساعات الطويلة"
+      ],
+      "angle_fr": "8000 Hz is the difference you feel in an FPS, not one you read about.",
+      "angle_ar": "8000 هرتز هو الفرق اللي تحس بيه في ال FPS، موش اللي تقراه."
+    },
+    {
+      "id": "vxe-r1-se",
+      "name": "VXE R1 SE+ Wireless - White",
+      "name_ar": "ماوس VXE R1 SE+ لاسلكي - أبيض",
+      "price": 8200,
+      "specs": [
+        "PixArt PAW3395 SE sensor - 18000 DPI",
+        "51 g, 70 h battery at 1000 Hz",
+        "400 IPS tracking speed, 40 G acceleration"
+      ],
+      "ar_specs": [
+        "حساس PixArt PAW3395 SE - 18000 DPI",
+        "51 غرام، بطارية 70 ساعة",
+        "سرعة تتبع 400 IPS، تسارع 40G"
+      ],
+      "angle_fr": "White, 51 grams, 70 hours of battery. The cleanest one on the page.",
+      "angle_ar": "أبيض، 51 غرام، وبطارية 70 ساعة. أنظف واحد في الصفحة."
+    },
+    {
+      "id": "as-x3-pro",
+      "name": "Attack Shark X3 Pro",
+      "name_ar": "ماوس Attack Shark X3 Pro",
+      "price": 12200,
+      "specs": [
+        "PixArt PAW3395 - up to 26000 DPI",
+        "8000 Hz wired / 1000 Hz wireless",
+        "650 IPS tracking, 50 G acceleration"
+      ],
+      "ar_specs": [
+        "حساس PixArt PAW3395 - حتى 26000 DPI",
+        "8000 هرتز سلكي / 1000 لاسلكي",
+        "تتبع 650 IPS، تسارع 50G"
+      ],
+      "angle_fr": "The top of the range. 26000 DPI and 8000 Hz on the cable.",
+      "angle_ar": "الأعلى في الفئة. 26000 DPI و8000 هرتز بالسلك."
+    }
+  ],
+  "engagement_question": {
+    "fr": "Vous cherchez quelle souris pour votre setup ? Dites-le en message, on conseille.",
+    "ar": "تشتوا أي ماوس لـ setup تاعكم؟ ابعثولنا في message ونعطيكمAdvice"
+  }
+}

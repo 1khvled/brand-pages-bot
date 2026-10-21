@@ -1,0 +1,89 @@
+name: Brand page poster
+
+# Posts to a CLIENT page (AZTech Store). The bot decides whether it is time
+# to post: the cadence lives in brand.json, not here. Polling every 30 min
+# means a post lands within 30 min of the allowed window opening, and the
+# bot itself refuses to exceed posts_per_day.
+#
+# Credentials (secrets):
+#   FB_USER_TOKEN        - the user token that administers the Page. The bot
+#                          MINTS a fresh Page token from it on every run, so a
+#                          stale Page token can never break the pipeline again.
+#   GEMINI_API_KEYS      - comma-separated key pool, rotated per run
+#   OPENROUTER_API_KEY   - fallback writer
+#   TELEGRAM_BOT_TOKEN   - optional, failure alerts
+#   TELEGRAM_CHAT_ID     - optional
+
+on:
+  schedule:
+    - cron: "7,37 * * * *"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Ignore the cadence and post now"
+        required: false
+        default: "0"
+      story:
+        description: "Also publish a story"
+        required: false
+        default: "1"
+
+permissions:
+  contents: write
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+      FB_USER_TOKEN: ${{ secrets.FB_USER_TOKEN }}
+      GEMINI_API_KEYS: ${{ secrets.GEMINI_API_KEYS }}
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install deps
+        run: pip install -r requirements.txt
+
+      - name: Collect engagement (learn which product works)
+        continue-on-error: true
+        run: python brand_bot.py --brand brand.json --collect
+
+      - name: Post
+        id: post
+        continue-on-error: true
+        run: |
+          set +e
+          python brand_bot.py --brand brand.json --scheduled \
+            ${{ inputs.force == '1' && '--force' || '' }} \
+            ${{ (inputs.story == '1' || inputs.story == '') && '--story' || '' }}
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit $code
+
+      - name: Commit state
+        if: always()
+        run: |
+          git config user.name "brand-bot"
+          git config user.email "brand-bot@users.noreply.github.com"
+          git pull --rebase || true
+          git add state_*.json || true
+          git diff --staged --quiet || git commit -m "bot: update brand state [skip ci]" || true
+          git pull --rebase || true
+          git push || true
+
+      - name: Alert on failure
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          curl -sS -X POST "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
+            -d chat_id="$TELEGRAM_CHAT_ID" \
+            -d text="Brand page bot FAILED. Run ${{ github.run_id }}: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            >/dev/null || true
