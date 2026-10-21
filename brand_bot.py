@@ -73,8 +73,23 @@ _load_env()
 
 # ----------------------------------------------------------------------
 def load_brand(path: Path) -> dict:
-    b = json.loads(path.read_text(encoding="utf-8"))
-    b["_dir"] = str(path.parent)
+    """Load a brand config.
+
+    A path, or the literal string "env" to read BRAND_JSON from the
+    environment. That is how a CLIENT config stays private: the repo holds
+    the code (public, so the Actions minutes are free and the code doubles as
+    a portfolio piece) while the client's products and prices live in a
+    repository secret.
+    """
+    if str(path) == "env":
+        raw = os.getenv("BRAND_JSON", "")
+        if not raw:
+            raise SystemExit("BRAND_JSON env var is empty")
+        b = json.loads(raw)
+        b["_dir"] = str(HERE)
+    else:
+        b = json.loads(path.read_text(encoding="utf-8"))
+        b["_dir"] = str(path.parent)
     b.setdefault("_state", str(HERE / f"state_{b['page_id']}.json"))
     b.setdefault("_out", str(HERE / "out"))
     # asset paths are relative to the brand file, so the same config runs on
@@ -82,7 +97,7 @@ def load_brand(path: Path) -> dict:
     for k in ("logo", "cover"):
         v = b.get(k)
         if v and not os.path.isabs(v):
-            b[k] = str((path.parent / v).resolve())
+            b[k] = str((Path(b["_dir"]) / v).resolve())
     return b
 
 

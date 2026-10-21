@@ -50,16 +50,31 @@ jobs:
       - name: Install deps
         run: pip install -r requirements.txt
 
+      # The brand config comes from a secret when one is set, so a CLIENT's
+      # product list and prices never have to be public. Falls back to the
+      # demo config in the repo.
+      - name: Resolve brand config
+        env:
+          BRAND_JSON: ${{ secrets.BRAND_JSON }}
+        run: |
+          if [ -n "$BRAND_JSON" ]; then
+            echo "BRAND_JSON=env" > brand_arg.txt
+            echo "using the BRAND_JSON secret"
+          else
+            echo "brand.json" > brand_arg.txt
+            echo "using the repo's demo brand.json"
+          fi
+
       - name: Collect engagement (learn which product works)
         continue-on-error: true
-        run: python brand_bot.py --brand brand.json --collect
+        run: python brand_bot.py --brand "$(cat brand_arg.txt)" --collect
 
       - name: Post
         id: post
         continue-on-error: true
         run: |
           set +e
-          python brand_bot.py --brand brand.json --scheduled \
+          python brand_bot.py --brand "$(cat brand_arg.txt)" --scheduled \
             ${{ inputs.force == '1' && '--force' || '' }} \
             ${{ (inputs.story == '1' || inputs.story == '') && '--story' || '' }}
           code=$?
