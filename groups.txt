@@ -1,0 +1,32 @@
+# ============================================================================
+#  GROUP SHARE TARGET LIST
+#  One group per line. A group URL or a group name (facebook.com/groups/<name>).
+#  Blank lines and lines starting with # are ignored.
+#
+#  HOW TO BUILD THIS LIST
+#    python group_share.py --find-groups     # lists every group you belong to
+#    -> writes groups_found.txt, copy the ones you want into this file
+#
+#  WHICH GROUPS TO PICK
+#    The algorithm will not surface a page with 0-6 followers. A group will.
+#    Pick groups where a market/AI/crypto post is a NATURAL post, not an ad:
+#      - crypto and Web3 rooms (highest intent, fastest follower growth)
+#      - per-stock and per-ticker fan groups (the cheapest reach on Facebook)
+#      - macro / economics / recession-watch groups
+#      - gold, silver, oil and commodity groups
+#      - AI-tool groups, indie-maker and SaaS groups
+#      - Algerian / Maghreb business and finance groups
+#
+#  RULES THE BOT ENFORCES
+#    - one post per group per day
+#    - 20+ seconds between groups
+#    - it never posts without --share
+#    - --dry-run only takes a screenshot, it never presses Post
+#
+#  NEVER put a group where you are not a member. The composer will not open
+#  and the run logs it, but it wastes the session.
+# ============================================================================
+
+# --- example, uncomment and edit:
+# https://www.facebook.com/groups/somecrypto
+# https://www.facebook.com/groups/somestocks

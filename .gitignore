@@ -1,5 +1,8 @@
-﻿out/
+﻿.fbprofile/
+group_share_state.json
+groups_found.txt
+_shot_*.png
+out/
 __pycache__/
 *.pyc
-.env
-.photo_cache/
+shots/
