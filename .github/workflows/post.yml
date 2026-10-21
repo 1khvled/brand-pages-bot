@@ -1,18 +1,24 @@
 name: Brand page poster
 
-# Posts to a CLIENT page (AZTech Store). The bot decides whether it is time
-# to post: the cadence lives in brand.json, not here. Polling every 30 min
-# means a post lands within 30 min of the allowed window opening, and the
-# bot itself refuses to exceed posts_per_day.
+# Posts to a CLIENT page. The bot decides whether it is time to post: the
+# cadence lives in the brand config, not here. Polling every 30 min means a
+# post lands within 30 min of the allowed window opening, and the bot itself
+# refuses to exceed posts_per_day.
+#
+# STATUS: no client yet, so this workflow is DISABLED. It stays off until a
+# real client exists - a client config goes in as the BRAND_JSON secret and
+# FB_PAGE_ID + FB_USER_TOKEN are set. Do not enable it without both.
 #
 # Credentials (secrets):
-#   FB_USER_TOKEN        - the user token that administers the Page. The bot
-#                          MINTS a fresh Page token from it on every run, so a
-#                          stale Page token can never break the pipeline again.
-#   GEMINI_API_KEYS      - comma-separated key pool, rotated per run
-#   OPENROUTER_API_KEY   - fallback writer
-#   TELEGRAM_BOT_TOKEN   - optional, failure alerts
-#   TELEGRAM_CHAT_ID     - optional
+#   BRAND_JSON          - the filled brand config (client prices stay private)
+#   FB_PAGE_ID          - the client's Page id
+#   FB_USER_TOKEN       - a user token that administers that Page. The bot
+#                         MINTS a fresh Page token from it on every run, so a
+#                         stale Page token can never break the pipeline again.
+#   GEMINI_API_KEYS     - comma-separated key pool, rotated per run
+#   OPENROUTER_API_KEY  - fallback writer
+#   TELEGRAM_BOT_TOKEN  - optional, failure alerts
+#   TELEGRAM_CHAT_ID    - optional
 
 on:
   schedule:

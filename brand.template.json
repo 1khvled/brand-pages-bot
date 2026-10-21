@@ -1,0 +1,82 @@
+{
+  "_README": [
+    "TEMPLATE brand config. Copy it, fill it in, point the workflow at it.",
+    "Everything here is a PLACEHOLDER - no real business data lives in this file.",
+    "For a client, put the filled config in the BRAND_JSON repository secret",
+    "instead of committing it, so the client's products and prices stay private."
+  ],
+
+  "brand": "Your Brand",
+  "page_id": "000000000000000",
+  "locale": "fr-DZ",
+  "languages": ["ar", "fr"],
+
+  "bg": "#08080A",
+  "accent": "#1E88FF",
+  "white": "#F5F7FA",
+  "muted": "#8A94A6",
+
+  "logo": "assets/placeholder_logo.jpg",
+  "tagline": "YOUR TAGLINE",
+  "delivery_fr": "Livraison <wilayas>",
+  "delivery_ar": "التوصيل <wilayas>",
+  "cta_fr": "Commande : message prive",
+  "cta_ar": "للطلب : ارسل رسالة",
+  "price_note": "Neuf, garantie, prix ferme",
+  "zone": "<city / wilaya>",
+
+  "cadence": {
+    "posts_per_day": 2,
+    "stories_per_day": 1,
+    "min_gap_minutes": 180,
+    "quiet_hours_local": [0, 6],
+    "post_hours_local": [9, 23]
+  },
+
+  "voice": {
+    "ar": "Arabic a young Algerian would actually write. Short lines. Darija warmth, modern MSA. Always the price and the delivery. Never invent a spec. Never use 'like and share'.",
+    "fr": "Short, confident, friendly French from an Algerian shop. Always the price and the delivery. Never invent a spec. Never use 'like and share'."
+  },
+
+  "forbidden": [
+    "like", "share", "commentez", "follow us", "subscribe",
+    "livraison gratuite", "garantie a vie", "meilleur prix", "numero 1",
+    "offre limitee", "soldes", "promo"
+  ],
+
+  "products": [
+    {
+      "id": "product-a",
+      "name": "Product A - <full product name>",
+      "name_ar": "منتج أ - <الاسم بالعربية>",
+      "price": 0,
+      "specs": [
+        "<spec 1>",
+        "<spec 2>",
+        "<spec 3>"
+      ],
+      "ar_specs": [
+        "<المواصفة 1>",
+        "<المواصفة 2>",
+        "<المواصفة 3>"
+      ],
+      "angle_fr": "<the one angle that makes this product worth a post>",
+      "angle_ar": "<same angle in Arabic>"
+    },
+    {
+      "id": "product-b",
+      "name": "Product B - <full product name>",
+      "name_ar": "منتج ب - <الاسم بالعربية>",
+      "price": 0,
+      "specs": ["<spec 1>", "<spec 2>", "<spec 3>"],
+      "ar_specs": ["<المواصفة 1>", "<المواصفة 2>", "<المواصفة 3>"],
+      "angle_fr": "<angle>",
+      "angle_ar": "<angle>"
+    }
+  ],
+
+  "engagement_question": {
+    "fr": "<one genuine question a real buyer would answer>",
+    "ar": "<one genuine question a real buyer would answer>"
+  }
+}

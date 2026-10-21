@@ -387,7 +387,7 @@ def publish(brand: dict, caption: str, card_path: Path, want_story: bool,
 # ----------------------------------------------------------------------
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--brand", default=str(HERE / "brand.json"))
+    ap.add_argument("--brand", default=str(HERE / "brand.template.json"))
     ap.add_argument("--post", action="store_true")
     ap.add_argument("--story", action="store_true")
     ap.add_argument("--preview", action="store_true")
