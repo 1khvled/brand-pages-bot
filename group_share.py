@@ -162,16 +162,28 @@ def share_text_for(post: dict) -> str:
 
 
 # ------------------------------------------------------------------ browser
-async def open_browser(pw, headless: bool = False):
+async def open_browser(pw, headless: bool = False, chrome: bool = False):
+    """Open the saved profile.
+
+    `chrome=True` uses the installed Google Chrome instead of the bundled
+    Chromium. Facebook is noticeably pickier about the bundled build - it
+    serves a checkpoint ("confirm it's you", a captcha) that the real Chrome
+    does not. The profile directory is still ours, so the user's own browser
+    profile and their open windows are never touched.
+    """
     PROFILE.mkdir(parents=True, exist_ok=True)
-    return await pw.chromium.launch_persistent_context(
-        str(PROFILE),
+    kwargs = dict(
+        user_data_dir=str(PROFILE),
         headless=headless,
         user_agent=UA,
         locale="en-US",
         viewport={"width": 1400, "height": 900},
-        args=["--disable-blink-features=AutomationControlled", "--no-sandbox"],
+        args=["--disable-blink-features=AutomationControlled", "--no-sandbox",
+              "--disable-blink-features=AutomationControlled"],
     )
+    if chrome:
+        kwargs["channel"] = "chrome"
+    return await pw.chromium.launch_persistent_context(**kwargs)
 
 
 async def first_visible(page, candidates, timeout_ms: int = 5000):
@@ -190,27 +202,68 @@ async def first_visible(page, candidates, timeout_ms: int = 5000):
 async def is_logged_in(page) -> bool:
     """Is the session authenticated?
 
-    The old check looked only for a handful of aria-labels, and Facebook
-    changes those often - so a successful login was reported as a failure
-    and the window closed on a logged-in session. Three signals instead:
-    a visible password field means the login form is up; a /login URL means
-    the same; and the absence of both, on a facebook.com page, means the
-    session is live.
+    The only proof that counts is the pair of cookies Facebook sets on a
+    signed-in profile: `c_user` (the user id) and `xs` (the session token).
+    Everything else is a NEGATIVE signal - a password field, a /login URL, a
+    missing marker - and negatives cannot prove a session.
+
+    Two earlier versions got this wrong. The first looked for a handful of
+    aria-labels that Facebook changes often, so a real login was reported as
+    a failure. The second fell back to "we are on facebook.com, so probably
+    logged in", which reported a login that never happened and closed the
+    window on an anonymous profile.
     """
+    try:
+        names = {c["name"] for c in await page.context.cookies()}
+    except Exception:
+        names = set()
+    if "c_user" in names and "xs" in names:
+        return True
     url = (page.url or "").lower()
+    if "/login" in url or "login." in url:
+        return False
     try:
         pw = page.locator('input[name="pass"], input#pass')
         if await pw.count() and await pw.first.is_visible():
             return False
     except Exception:
         pass
-    if "/login" in url or "login." in url:
-        return False
-    sel, _ = await first_visible(page, LOGGED_IN_CANDIDATES, 2000)
-    if sel is not None:
-        return True
-    # no password field, no login URL, and we are on facebook -> logged in
-    return "facebook.com" in url
+    sel, _ = await first_visible(page, LOGGED_IN_CANDIDATES, 1500)
+    return sel is not None
+
+
+async def login_diagnosis(page) -> str:
+    """What was actually on screen - so a failed login is not a mystery."""
+    bits = []
+    try:
+        bits.append(f"url={page.url}")
+    except Exception:
+        pass
+    try:
+        title = await page.title()
+        if title:
+            bits.append(f"title={title!r}")
+    except Exception:
+        pass
+    try:
+        body = (await page.inner_text("body"))[:1200].lower()
+    except Exception:
+        body = ""
+    for needle, label in (
+        ("captcha", "CAPTCHA"),
+        ("security code", "2FA / security code"),
+        ("two-factor", "2FA"),
+        ("checkpoint", "CHECKPOINT - confirm it's you"),
+        ("confirm it's you", "CHECKPOINT - confirm it's you"),
+        ("suspended", "ACCOUNT SUSPENDED"),
+        ("incorrect password", "wrong password"),
+        ("temporarily blocked", "rate limited / temporarily blocked"),
+        ("log in", "the login form is still up"),
+        ("new password", "a password-change prompt"),
+    ):
+        if needle in body:
+            bits.append(label)
+    return "; ".join(bits) if bits else "nothing recognisable on the page"
 
 
 async def dismiss_overlays(page) -> None:
@@ -256,7 +309,7 @@ async def paste_text(page, text: str) -> bool:
 async def cmd_login(args):
     from playwright.async_api import async_playwright
     async with async_playwright() as pw:
-        ctx = await open_browser(pw, headless=False)
+        ctx = await open_browser(pw, headless=False, chrome=args.chrome)
         page = ctx.pages[0] if ctx.pages else await ctx.new_page()
         await page.goto("https://www.facebook.com/login", wait_until="domcontentloaded",
                         timeout=60000)
@@ -282,6 +335,7 @@ async def cmd_login(args):
         print("Leave the window open - the session is saved when the login lands.")
         print("The session is saved in:", PROFILE)
         print("Waiting up to 30 minutes for the login to complete...\n")
+        last = ""
         for i in range(600):
             await page.wait_for_timeout(3000)
             if await is_logged_in(page):
@@ -290,9 +344,21 @@ async def cmd_login(args):
                 await ctx.close()
                 return 0
             if i % 10 == 9:
-                print(f"  ...still waiting ({(i + 1) * 3}s) "
-                      f"- log in in the window", flush=True)
-        print("Login not detected. Run it again and complete the login.")
+                now = await login_diagnosis(page)
+                if now != last:
+                    print(f"  ...still waiting ({(i + 1) * 3}s) - {now}", flush=True)
+                    last = now
+                else:
+                    print(f"  ...still waiting ({(i + 1) * 3}s)", flush=True)
+        print("Login not detected.")
+        print("  what was on screen:", await login_diagnosis(page))
+        try:
+            shot = PROFILE.parent.parent / "out" / "login_timeout.png"
+            shot.parent.mkdir(parents=True, exist_ok=True)
+            await page.screenshot(path=str(shot), full_page=False)
+            print("  screenshot:", shot)
+        except Exception as ex:
+            print("  screenshot failed:", ex)
         await ctx.close()
         return 1
 
@@ -521,6 +587,9 @@ async def cmd_share(args):
 async def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--login", action="store_true")
+    ap.add_argument("--chrome", action="store_true",
+                    help="use the installed Google Chrome instead of the "
+                         "bundled Chromium (the platform is pickier)")
     ap.add_argument("--find-groups", action="store_true")
     ap.add_argument("--probe", action="store_true")
     ap.add_argument("--share", action="store_true")
