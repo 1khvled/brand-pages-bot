@@ -108,7 +108,7 @@ def post(path: str, token: str, **data) -> dict:
 def read_names(args) -> list:
     names = []
     if args.group:
-        names.append(args.group)
+        names += list(args.group)
     if args.file:
         p = Path(args.file)
         if not p.exists():
